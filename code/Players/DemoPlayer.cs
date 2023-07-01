@@ -98,6 +98,17 @@ partial class DemoPlayer : Player
         return base.GetActiveController();
     }
 
+    protected virtual void HandleInventoryScrolling(bool allowEmpty)
+    {
+        var scrollDelta = Input.MouseWheel;
+
+        if(scrollDelta == 0)
+            return;
+
+        if(Inventory is DemoInventory demoInventory)
+            demoInventory.ScrollActiveSlot(scrollDelta, true);
+    }
+
     public override void Simulate(IClient cl)
     {
         base.Simulate(cl);
@@ -115,6 +126,8 @@ partial class DemoPlayer : Player
 
         TickPlayerUse();
         SimulateActiveChild(cl, ActiveChild);
+
+        HandleInventoryScrolling(true);
 
         if(Input.Pressed("view"))
         {

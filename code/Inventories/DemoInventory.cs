@@ -53,4 +53,30 @@ partial class DemoInventory : BaseInventory
 
         return ent.Parent == null;
     }
+
+    public virtual void ScrollActiveSlot(int delta, bool allowEmpty = true)
+    {
+        int slotsCount = Count();
+        if(slotsCount == 0)
+            return;
+
+        if(allowEmpty)
+            slotsCount++;
+
+        int currentSlot = GetActiveSlot();
+
+        int newSlot = currentSlot + delta;
+
+        if(allowEmpty)
+            newSlot++;
+
+        newSlot %= slotsCount;
+        newSlot += slotsCount;
+        newSlot %= slotsCount;
+
+        if(allowEmpty)
+            newSlot--;
+
+        SetActiveSlot(newSlot, allowEmpty);
+    }
 }
