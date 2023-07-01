@@ -7,50 +7,50 @@ namespace EasyWeapons.Demo.Inventories;
 
 partial class DemoInventory : BaseInventory
 {
-	public DemoInventory( Player player ) : base( player )
-	{
-	}
+    public DemoInventory(Player player) : base(player)
+    {
+    }
 
-	public override bool CanAdd( Entity entity )
-	{
-		if ( !entity.IsValid() )
-			return false;
+    public override bool CanAdd(Entity entity)
+    {
+        if(!entity.IsValid())
+            return false;
 
-		if ( !base.CanAdd( entity ) )
-			return false;
+        if(!base.CanAdd(entity))
+            return false;
 
-		return !IsCarryingType( entity.GetType() );
-	}
+        return !IsCarryingType(entity.GetType());
+    }
 
-	public override bool Add( Entity entity, bool makeActive = false )
-	{
-		if ( !entity.IsValid() )
-			return false;
+    public override bool Add(Entity entity, bool makeActive = false)
+    {
+        if(!entity.IsValid())
+            return false;
 
-		if ( IsCarryingType( entity.GetType() ) )
-			return false;
+        if(IsCarryingType(entity.GetType()))
+            return false;
 
-		return base.Add( entity, makeActive );
-	}
+        return base.Add(entity, makeActive);
+    }
 
-	public bool IsCarryingType( Type t )
-	{
-		return List.Any( x => x?.GetType() == t );
-	}
+    public bool IsCarryingType(Type t)
+    {
+        return List.Any(x => x?.GetType() == t);
+    }
 
-	public override bool Drop( Entity ent )
-	{
-		if ( !Game.IsServer )
-			return false;
+    public override bool Drop(Entity ent)
+    {
+        if(!Game.IsServer)
+            return false;
 
-		if ( !Contains( ent ) )
-			return false;
+        if(!Contains(ent))
+            return false;
 
-		if ( ent is BaseCarriable bc )
-		{
-			bc.OnCarryDrop( Owner );
-		}
+        if(ent is BaseCarriable bc)
+        {
+            bc.OnCarryDrop(Owner);
+        }
 
-		return ent.Parent == null;
-	}
+        return ent.Parent == null;
+    }
 }
