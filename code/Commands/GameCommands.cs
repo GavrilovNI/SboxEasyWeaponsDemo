@@ -7,6 +7,29 @@ namespace EasyWeapons.Demo.Commands;
 
 public static partial class GameCommands
 {
+    [ConCmd.Server("get")]
+    public static void GetEntity(string entName)
+    {
+        if(ConsoleSystem.Caller.Pawn is not Player owner)
+            return;
+
+        var entityType = TypeLibrary.GetType<Entity>(entName)?.TargetType;
+
+        if(entityType == null)
+            return;
+
+        if(!TypeLibrary.HasAttribute<SpawnableAttribute>(entityType))
+            return;
+
+        var ent = TypeLibrary.Create<Entity>(entityType);
+        if(ent is BaseCarriable && owner.Inventory != null)
+        {
+            if(owner.Inventory.Add(ent, true))
+                return;
+        }
+
+        ent.Delete();
+    }
 
     [ConCmd.Server("create")]
     public static async Task Create(string modelname)
