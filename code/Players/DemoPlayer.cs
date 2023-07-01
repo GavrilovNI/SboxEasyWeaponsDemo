@@ -156,32 +156,6 @@ partial class DemoPlayer : Player
         }
     }
 
-    [ConCmd.Admin("noclip")]
-    static void DoPlayerNoclip()
-    {
-        if(ConsoleSystem.Caller.Pawn is DemoPlayer basePlayer)
-        {
-            if(basePlayer.DevController is NoclipController)
-            {
-                basePlayer.DevController = null;
-            }
-            else
-            {
-                basePlayer.DevController = new NoclipController();
-            }
-        }
-    }
-
-    [ConCmd.Admin("kill")]
-    static void DoPlayerSuicide()
-    {
-        if(ConsoleSystem.Caller.Pawn is DemoPlayer basePlayer)
-        {
-            basePlayer.TakeDamage(new DamageInfo { Damage = basePlayer.Health * 99 });
-        }
-    }
-
-
     Entity lastWeapon;
 
     void SimulateAnimation(PawnController controller)
