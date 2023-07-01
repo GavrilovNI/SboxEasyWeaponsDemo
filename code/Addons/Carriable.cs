@@ -2,30 +2,30 @@
 
 public partial class Carriable : BaseCarriable, IUse
 {
-	public override void CreateViewModel()
-	{
-		Game.AssertClient();
+    public override void CreateViewModel()
+    {
+        Game.AssertClient();
 
-		if ( string.IsNullOrEmpty( ViewModelPath ) )
-			return;
+        if ( string.IsNullOrEmpty( ViewModelPath ) )
+            return;
 
-		ViewModelEntity = new ViewModel
-		{
-			Position = Position,
-			Owner = Owner,
-			EnableViewmodelRendering = true
-		};
+        ViewModelEntity = new ViewModel
+        {
+            Position = Position,
+            Owner = Owner,
+            EnableViewmodelRendering = true
+        };
 
-		ViewModelEntity.SetModel( ViewModelPath );
-	}
+        ViewModelEntity.SetModel( ViewModelPath );
+    }
 
-	public bool OnUse( Entity user )
-	{
-		return false;
-	}
+    public bool OnUse( Entity user )
+    {
+        return false;
+    }
 
-	public virtual bool IsUsable( Entity user )
-	{
-		return Owner == null;
-	}
+    public virtual bool IsUsable( Entity user )
+    {
+        return Owner == null;
+    }
 }
