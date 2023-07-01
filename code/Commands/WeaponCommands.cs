@@ -8,11 +8,6 @@ public static class WeaponCommands
     [ConCmd.Admin("weapon_attack")]
     public static void Create(int entityIndex)
     {
-        var owner = ConsoleSystem.Caller?.Pawn as Player;
-
-        if(ConsoleSystem.Caller is null)
-            return;
-
         var weapon = Entity.FindByIndex(entityIndex);
         if(weapon is null)
         {
