@@ -1,4 +1,5 @@
-﻿using Sandbox;
+﻿using EasyWeapons.Extensions;
+using Sandbox;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,6 +8,26 @@ namespace EasyWeapons.Demo.Commands;
 
 public static partial class GameCommands
 {
+    [ConCmd.Server("get_ammo")]
+    public static void GetEntity(string ammoName, int count)
+    {
+        var pawn = ConsoleSystem.Caller.Pawn;
+        if(pawn is null)
+            return;
+
+        var inventory = pawn.GetOrCreateAmmoInventoryComponent()!.AmmoInventory;
+
+        if(inventory.CanAdd(ammoName, count))
+        {
+            using(Prediction.Off())
+                inventory.Add(ammoName, count);
+        }
+        else
+        {
+            Log.Error("Can't add ammo.");
+        }
+    }
+
     [ConCmd.Server("get")]
     public static void GetEntity(string entName)
     {
