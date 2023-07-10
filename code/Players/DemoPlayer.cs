@@ -1,4 +1,5 @@
 ﻿using EasyWeapons.Demo.Inventories;
+using EasyWeapons.Entities.Components;
 using Sandbox;
 
 namespace EasyWeapons.Demo.Players;
@@ -115,6 +116,9 @@ partial class DemoPlayer : Player
 
         if(LifeState != LifeState.Alive)
             return;
+
+        foreach(var simulatedComponent in Components.GetAll<ISimulatedComponent>())
+            simulatedComponent.Simulate(cl);
 
         var controller = GetActiveController();
         if(controller != null)
