@@ -1,5 +1,6 @@
 ﻿using EasyWeapons.Demo.Inventories;
 using EasyWeapons.Entities.Components;
+using EasyWeapons.Recoiles;
 using Sandbox;
 
 namespace EasyWeapons.Demo.Players;
@@ -19,6 +20,9 @@ partial class DemoPlayer : Player
     public DemoPlayer()
     {
         Inventory = new DemoInventory(this);
+
+        if(Game.IsServer)
+            Components.Add(new DefaultPlayerRecoilApplier());
     }
 
     public DemoPlayer(IClient cl) : this()
