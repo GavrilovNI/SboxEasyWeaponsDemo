@@ -1,18 +1,18 @@
 {
   "Title": "Easy Weapons Demo",
   "Type": "game",
-  "Org": "local",
+  "Org": "doggy",
   "Ident": "easy_weapons_demo",
   "Tags": null,
   "Schema": 1,
   "HasAssets": true,
   "AssetsPath": "",
   "Resources": null,
-  "MenuResources": null,
+  "MenuResources": "",
   "HasCode": true,
   "CodePath": "/code/",
   "PackageReferences": [
-    "local.easy_weapons"
+    "doggy.easy_weapons"
   ],
   "EditorReferences": null,
   "Metadata": {
