@@ -45,7 +45,7 @@
         "MapName": "facepunch.flatgrass",
         "MaxPlayers": 1,
         "GameSettings": {},
-        "Addons": "doggy.ew_pistol#local;local.ew_smg#local",
+        "Addons": "doggy.ew_pistol#local;doggy.ew_smg#local",
         "PreLaunchCommand": "",
         "PostLaunchCommand": ""
       }
