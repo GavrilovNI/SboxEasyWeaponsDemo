@@ -14,6 +14,8 @@ partial class DemoPlayer : Player
 
     [Net, Predicted]
     public bool ThirdPersonCamera { get; set; }
+    [Net, Predicted]
+    public bool ThirdPersonCameraFront { get; set; }
 
     public ClothingContainer Clothing = new();
 
@@ -139,7 +141,23 @@ partial class DemoPlayer : Player
 
         if(Input.Pressed("view"))
         {
-            ThirdPersonCamera = !ThirdPersonCamera;
+            if(ThirdPersonCamera)
+            {
+                if(ThirdPersonCameraFront)
+                {
+                    ThirdPersonCameraFront = false;
+                    ThirdPersonCamera = false;
+                }
+                else
+                {
+                    ThirdPersonCameraFront = true;
+                }
+            }
+            else
+            {
+                ThirdPersonCamera = true;
+                ThirdPersonCameraFront = false;
+            }
         }
 
         if(Input.Pressed("drop"))
@@ -280,10 +298,14 @@ partial class DemoPlayer : Player
 
         if(ThirdPersonCamera)
         {
+            if(ThirdPersonCameraFront)
+                Camera.Rotation = Rotation.LookAt(Camera.Rotation.Backward, Camera.Rotation.Up);
+
             Camera.FirstPersonViewer = null;
 
             Vector3 targetPos;
             var center = Position + Vector3.Up * 64;
+
 
             var pos = center;
             var rot = Camera.Rotation * Rotation.FromAxis(Vector3.Up, -16);
