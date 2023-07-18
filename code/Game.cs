@@ -1,11 +1,11 @@
 ﻿using EasyWeapons.Demo.Players;
+using EasyWeapons.Events;
 using Sandbox;
 
 namespace EasyWeapons.Demo;
 
 public partial class MyGame : GameManager
 {
-
     public override void ClientJoined(IClient cl)
     {
         base.ClientJoined(cl);
@@ -15,8 +15,10 @@ public partial class MyGame : GameManager
         cl.Pawn = player;
     }
 
-    protected override void OnDestroy()
+    public override void Simulate(IClient client)
     {
-        base.OnDestroy();
+        Event.Run(CustomGameEvent.PreSimulate, client);
+        base.Simulate(client);
+        Event.Run(CustomGameEvent.PostSimulate, client);
     }
 }
