@@ -261,32 +261,6 @@ partial class DemoPlayer : Player
         return Velocity.WithZ(0).Length.LerpInverse(0.0f, 200.0f) * 5.0f;
     }
 
-    [ConCmd.Server("inventory_current")]
-    public static void SetInventoryCurrent(string entName)
-    {
-        var target = ConsoleSystem.Caller.Pawn as Player;
-        if(target == null)
-            return;
-
-        var inventory = target.Inventory;
-        if(inventory == null)
-            return;
-
-        for(int i = 0; i < inventory.Count(); ++i)
-        {
-            var slot = inventory.GetSlot(i);
-            if(!slot.IsValid())
-                continue;
-
-            if(slot.ClassName != entName)
-                continue;
-
-            inventory.SetActiveSlot(i, false);
-
-            break;
-        }
-    }
-
     public override void FrameSimulate(IClient cl)
     {
         Camera.Rotation = ViewAngles.ToRotation();
