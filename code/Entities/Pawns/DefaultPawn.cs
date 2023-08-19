@@ -2,13 +2,14 @@
 using EasyWeapons.Entities;
 using EasyWeapons.Entities.Components;
 using EasyWepons.Demo.Entities.Components;
+using PropHunt.Entities.Components;
 using Sandbox;
 using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace EasyWeapons.Demo.Entities.Pawns;
 
-public partial class DefaultPawn : AnimatedEntity, IRespawnable, IControllableEntity, IAnimatableCitizen
+public partial class DefaultPawn : AnimatedEntity, IRespawnable, IControllableEntity, IAnimatableCitizen, IPhysicsExpandable, IHullOwner
 {
     [Net, Local]
     public Model DefaultModel { get; set; } = Model.Load("models/citizen/citizen.vmdl");
@@ -19,14 +20,8 @@ public partial class DefaultPawn : AnimatedEntity, IRespawnable, IControllableEn
     [ClientInput]
     public Angles ViewAngles { get; set; }
 
-    public virtual BBox Hull
-    {
-        get => new
-        (
-            new Vector3(-16, -16, 0),
-            new Vector3(16, 16, 64)
-        );
-    }
+    [Net, Predicted, Local]
+    public BBox Hull { get; set; } = new(new Vector3(-16, -16, 0), new Vector3(16, 16, 72));
 
     [Browsable(false)]
     public Vector3 EyePosition
@@ -58,12 +53,17 @@ public partial class DefaultPawn : AnimatedEntity, IRespawnable, IControllableEn
     [BindComponent]
     public CameraSimulator? CameraSimulator { get; }
 
+    [BindComponent]
+    public HullUpdater? HullUpdater { get; }
+
     public override Ray AimRay => CameraSimulator!.AimRay;
 
-    public Ray EyeLookingRay => new (EyePosition, EyeRotation.Forward);
+    public Ray EyeLookingRay => new(EyePosition, EyeRotation.Forward);
+
 
     public override void Spawn()
     {
+        Components.Create<HullUpdater>();
         Components.Create<CameraSimulator>();
         Components.Create<DefaultPawnController>();
         Components.Create<PawnAnimator>();
@@ -181,5 +181,19 @@ public partial class DefaultPawn : AnimatedEntity, IRespawnable, IControllableEn
     public bool HasAnimatingEvent(string eventName)
     {
         return Controller?.HasEvent(eventName) ?? false;
+    }
+
+
+    public virtual void SetHull(BBox bBox) => Hull = bBox;
+
+    public virtual void SetPhysicsHeight(float height)
+    {
+        var newHull = new BBox(Hull.Mins, Hull.Maxs.WithZ(height));
+        if(HullUpdater is null)
+            Hull = newHull;
+        else
+            HullUpdater.SetTarget(newHull);
+
+        CameraSimulator!.EyePositionHeight = height - 16f;
     }
 }

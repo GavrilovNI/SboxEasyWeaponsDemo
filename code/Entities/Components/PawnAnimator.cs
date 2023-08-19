@@ -5,8 +5,7 @@ using EasyWeapons.Entities.Components;
 
 namespace EasyWepons.Demo.Entities.Components;
 
-
-public class PawnAnimator : EntityComponent<AnimatedEntity>, ISingletonComponent, ICitizenAnimator, ISimulatedComponent
+public class PawnAnimator : SpecificEntityComponent<AnimatedEntity, IAnimatableCitizen>, ISingletonComponent, ICitizenAnimator, ISimulatedComponent
 {
     protected virtual void AnimateDefault(CitizenAnimationHelper helper)
     {
@@ -14,13 +13,10 @@ public class PawnAnimator : EntityComponent<AnimatedEntity>, ISingletonComponent
         helper.HoldType = CitizenAnimationHelper.HoldTypes.None;
         helper.IsGrounded = Entity.GroundEntity.IsValid();
 
-        if(Entity is IAnimatableCitizen animatableCitizen)
-        {
-            helper.WithLookAt(animatableCitizen.EyeLookingRay.Position + animatableCitizen.EyeLookingRay.Forward * 100);
+        helper.WithLookAt(SpecificEntity.EyeLookingRay.Position + SpecificEntity.EyeLookingRay.Forward * 100);
 
-            if(animatableCitizen.HasAnimatingEvent("jump"))
-                helper.TriggerJump();
-        }
+        if(SpecificEntity.HasAnimatingEvent("jump"))
+            helper.TriggerJump();
     }
 
     protected virtual void AnimateByComponents(CitizenAnimationHelper helper)

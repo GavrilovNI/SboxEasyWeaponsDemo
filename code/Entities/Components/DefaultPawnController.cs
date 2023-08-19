@@ -1,17 +1,43 @@
 ﻿using EasyWeapons.Entities;
 using EasyWeapons.Entities.Components;
+using EasyWepons.Demo.Entities.Components;
 using Sandbox;
 using System;
 using System.Collections.Generic;
 
 namespace EasyWeapons.Demo.Entities.Components;
 
-public partial class DefaultPawnController : EntityComponent<Entity>, IPawnController, ISimulatedComponent
+public partial class DefaultPawnController : SpecificEntityComponent<Entity, IControllableEntity>, IPawnController, ISimulatedComponent, ICitizenAnimator
 {
-    public virtual int StepSize => 24;
-    public virtual int GroundAngle => 45;
-    public virtual int JumpSpeed => 300;
-    public virtual float Gravity => 800f;
+    [Net, Local]
+    public int StepSize { get; set; } = 24;
+    [Net, Local]
+    public int GroundAngle { get; set; } = 45;
+    [Net, Local]
+    public int JumpSpeed { get; set; } = 300;
+    [Net, Local]
+    public int CrouchingJumpSpeed { get; set; } = 200;
+    [Net, Local]
+    public float Gravity { get; set; } = 800f;
+
+    [Net, Local]
+    public float StandingHeight { get; set; } = 72;
+    [Net, Local]
+    public float CrouchingHeight { get; set; } = 54;
+    [Net, Local]
+    public float CrouchingSpeed { get; set; } = 64;
+
+    [Net, Local]
+    public float RunningMoveSpeed { get; set; } = 500;
+    [Net, Local]
+    public float WalkingMoveSpeed { get; set; } = 200;
+    [Net, Local]
+    public float CrouchingMoveSpeed { get; set; } = 100;
+
+    [Net, Predicted, Local]
+    public float CurrentHeight { get; set; } = 64;
+
+    public float DuckLevel => 1f - (CurrentHeight - CrouchingHeight) / (StandingHeight - CrouchingHeight);
 
     protected HashSet<string> ControllerEvents = new(StringComparer.OrdinalIgnoreCase);
 
@@ -29,13 +55,10 @@ public partial class DefaultPawnController : EntityComponent<Entity>, IPawnContr
         if(object.ReferenceEquals(Entity.Client, client) == false)
             return;
 
-        if(Entity is not IControllableEntity controllable)
-            return;
-
         ControllerEvents.Clear();
 
-        var movement = controllable.InputDirection.Normal;
-        var angles = controllable.ViewAngles.WithPitch(0);
+        var movement = SpecificEntity.InputDirection.Normal;
+        var angles = SpecificEntity.ViewAngles.WithPitch(0);
         var moveVector = Rotation.From(angles) * movement * 320f;
         var groundEntity = CheckForGround();
 
@@ -47,7 +70,7 @@ public partial class DefaultPawnController : EntityComponent<Entity>, IPawnContr
                 AddEvent("grounded");
             }
 
-            Entity.Velocity = Accelerate(Entity.Velocity, moveVector.Normal, moveVector.Length, 200.0f * (Input.Down("run") ? 2.5f : 1f), 7.5f);
+            Entity.Velocity = Accelerate(Entity.Velocity, moveVector.Normal, moveVector.Length, GetCurrentMoveSpeed(), 7.5f);
             Entity.Velocity = ApplyFriction(Entity.Velocity, 4.0f);
         }
         else
@@ -57,13 +80,13 @@ public partial class DefaultPawnController : EntityComponent<Entity>, IPawnContr
         }
 
         if(Input.Pressed("jump"))
-        {
             DoJump();
-        }
+
+        HandleCrouching();
 
         var mh = new MoveHelper(Entity.Position, Entity.Velocity)
         {
-            Trace = controllable.CreateTrace()
+            Trace = SpecificEntity.CreateTrace()
         };
 
         if(mh.TryMoveWithStep(Time.Delta, StepSize) > 0)
@@ -79,6 +102,32 @@ public partial class DefaultPawnController : EntityComponent<Entity>, IPawnContr
         GroundEntity = groundEntity;
     }
 
+    protected virtual float GetCurrentMoveSpeed()
+    {
+        if(Input.Down("duck"))
+            return CrouchingMoveSpeed;
+        else if(Input.Down("run"))
+            return RunningMoveSpeed;
+        return WalkingMoveSpeed;
+    }
+
+    protected virtual void HandleCrouching()
+    {
+        bool needCrouch = Input.Down("duck");
+        var targetHeight = needCrouch ? CrouchingHeight : StandingHeight;
+
+        if(CurrentHeight.AlmostEqual(targetHeight) == false)
+        {
+            var totalDelta = targetHeight - CurrentHeight;
+            var maxDistance = MathF.Min(CrouchingSpeed * Time.Delta, MathF.Abs(totalDelta));
+            var delta = MathF.Sign(targetHeight - CurrentHeight) * maxDistance;
+            CurrentHeight += delta;
+
+            if(Entity is IPhysicsExpandable expandable)
+                expandable.SetPhysicsHeight(CurrentHeight);
+        }
+    }
+
     protected virtual void DoJump()
     {
         if(Grounded)
@@ -89,12 +138,10 @@ public partial class DefaultPawnController : EntityComponent<Entity>, IPawnContr
 
     protected virtual Entity? CheckForGround()
     {
-        var controllable = (Entity as IControllableEntity)!;
-
         if(Entity.Velocity.z > 100f)
             return null;
 
-        var trace = controllable.CreateTrace(2f).FromTo(Entity.Position, Entity.Position + Vector3.Down).Run();
+        var trace = SpecificEntity.CreateTrace(2f).FromTo(Entity.Position, Entity.Position + Vector3.Down).Run();
 
         if(!trace.Hit)
             return null;
@@ -157,8 +204,7 @@ public partial class DefaultPawnController : EntityComponent<Entity>, IPawnContr
     protected virtual Vector3 ApplyJump(Vector3 input, string jumpType)
     {
         AddEvent(jumpType);
-
-        return input + Vector3.Up * JumpSpeed;
+        return input + Vector3.Up * (Input.Down("duck") ? CrouchingJumpSpeed : JumpSpeed);
     }
 
     protected virtual Vector3 StayOnGround(Vector3 position)
@@ -198,5 +244,10 @@ public partial class DefaultPawnController : EntityComponent<Entity>, IPawnContr
             return;
 
         ControllerEvents.Add(eventName);
+    }
+
+    public void Animate(CitizenAnimationHelper helper)
+    {
+        helper.DuckLevel = DuckLevel;
     }
 }

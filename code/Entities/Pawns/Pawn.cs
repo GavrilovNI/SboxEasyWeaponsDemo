@@ -56,4 +56,10 @@ public partial class Pawn : DefaultPawn
         if(Game.IsServer)
             EntitiesInventory?.Remove(child);
     }
+
+    public override void SetHull(BBox bBox)
+    {
+        base.SetHull(bBox);
+        SetupPhysicsFromAABB(PhysicsMotionType.Keyframed, Hull.Mins, Hull.Maxs);
+    }
 }
