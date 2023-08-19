@@ -1,52 +1,27 @@
-﻿using EasyWeapons.Demo.Players;
-using Sandbox;
-using System.Threading.Tasks;
+﻿using Sandbox;
 
 namespace EasyWeapons.Demo.Commands;
 
 public static class PlayerCommands
 {
-
-    [ConCmd.Admin("noclip")]
-    static void DoPlayerNoclip()
-    {
-        if(ConsoleSystem.Caller.Pawn is DemoPlayer basePlayer)
-        {
-            if(basePlayer.DevController is NoclipController)
-            {
-                basePlayer.DevController = null;
-            }
-            else
-            {
-                basePlayer.DevController = new NoclipController();
-            }
-        }
-    }
-
     [ConCmd.Admin("kill")]
-    static void DoPlayerSuicide()
+    public static void Kill()
     {
-        if(ConsoleSystem.Caller.Pawn is DemoPlayer basePlayer)
-        {
-            basePlayer.TakeDamage(new DamageInfo { Damage = basePlayer.Health * 99 });
-        }
+        if(CommandUtils.TryGetCallerPawnOrError<Entity>(out var pawn) == false)
+            return;
+
+        pawn!.TakeDamage(new DamageInfo { Damage = pawn.Health });
     }
 
     [ConCmd.Server("respawn")]
-    public static async Task Spawn()
+    public static void Respawn()
     {
-        var client = ConsoleSystem.Caller;
-
-        if(client == null)
+        if(CommandUtils.TryGetCallerOrError(out var client) == false)
             return;
 
-        var pawn = client.Pawn;
-        if(pawn != null)
-            pawn.Delete();
+        if(CommandUtils.TryGetGameManagerOrError<EasyWeaponsDemo>(out var manager) == false)
+            return;
 
-        var player = new DemoPlayer(client);
-        player.Respawn();
-
-        client.Pawn = player;
+        manager!.RespawnPlayer(client!);
     }
 }
