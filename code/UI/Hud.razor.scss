@@ -1,0 +1,20 @@
+Hud {
+    position: absolute;
+    margin: 0px;
+    height: 100%;
+    width: 100%;
+
+    .left {
+        position: absolute;
+        bottom: 0px;
+        left: 10px;
+        display: flex;
+        flex-direction: column-reverse;
+
+        PlayerHealth {
+            .label {
+                font-size: 9vh;
+            }
+        }
+    }
+}

@@ -1,0 +1,37 @@
+@using Sandbox;
+@using Sandbox.UI;
+
+
+@namespace EasyWeapons.Demo.UI
+@inherits Panel
+@attribute [StyleSheet]
+
+<root>
+	@{
+		var pawn = Game.LocalPawn;
+		if(pawn is not null)
+		{
+			var health = pawn.Health;
+			<label class="label" style="color: @GetColor(health).Hex">@health.CeilToInt()</label>
+		}
+	}
+</root>
+
+@code
+{
+	protected override int BuildHash()
+	{
+		var pawn = Game.LocalPawn;
+		if(pawn is null)
+			return 0;
+
+		return pawn.Health.GetHashCode();
+	}
+
+	protected Color GetColor(float health)
+	{
+		if(health < 20)
+			return Color.Red;
+		return Color.Parse("#e08f02").Value;
+	}
+}
