@@ -1,4 +1,5 @@
-﻿using EasyWepons.Demo.Entities.Pawns;
+﻿using EasyWeapons.Demo.UI;
+using EasyWepons.Demo.Entities.Pawns;
 using Sandbox;
 using System.Linq;
 
@@ -6,6 +7,12 @@ namespace EasyWeapons.Demo;
 
 public partial class EasyWeaponsDemo : GameManager
 {
+    public EasyWeaponsDemo()
+    {
+        if(Game.IsClient)
+            Game.RootPanel = new RootUI();
+    }
+
     public override void ClientJoined(IClient client)
     {
         base.ClientJoined(client);
