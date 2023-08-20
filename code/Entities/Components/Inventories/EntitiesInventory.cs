@@ -1,4 +1,5 @@
 ﻿using EasyWeapons.Entities.Components;
+using EasyWeapons.Events;
 using EasyWepons.Demo.Entities.Components;
 using Sandbox;
 using System.Collections;
@@ -158,8 +159,8 @@ public partial class EntitiesInventory : EntityComponent, IEnumerable<Entity>, I
         return true;
     }
 
-    [GameEvent.Client.BuildInput]
-    protected virtual void OnBuildInput()
+    [CustomGameEvent.Client.BuildInput.Post]
+    protected virtual void BuildInput()
     {
         if(Active.IsValid() && Contains(Active))
             Active.BuildInput();
