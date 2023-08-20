@@ -24,7 +24,7 @@ public static class InventoryCommands
     }
 
     [ConCmd.Admin("inv_add_entity")]
-    public static async Task GetEntity(string entityName, bool makeActive = false)
+    public static async Task AddEntity(string entityName, bool makeActive = true)
     {
         if(CommandUtils.TryGetCallerPawnComponentOrError<EntitiesInventory>(out var inventory) == false)
             return;
