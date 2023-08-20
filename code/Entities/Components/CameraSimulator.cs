@@ -73,6 +73,8 @@ public partial class CameraSimulator : EntityComponent<DefaultPawn>, IResetableC
     [GameEvent.Client.PostCamera]
     protected virtual void OnPostCamera()
     {
+        if(Entity.IsAuthority == false)
+            return;
         SimulateRotation();
 
         var cameraTransform = CalculateCameraTransform(IsThirdPersonInverted);
