@@ -43,7 +43,7 @@
         "Name": "EasyWeapons",
         "GameIdent": "doggy.easy_weapons_demo#local",
         "MapName": "facepunch.flatgrass",
-        "MaxPlayers": 1,
+        "MaxPlayers": 64,
         "GameSettings": {},
         "Addons": "doggy.ew_pistol#local;doggy.ew_smg#local",
         "PreLaunchCommand": "",
