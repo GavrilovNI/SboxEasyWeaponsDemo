@@ -62,4 +62,29 @@ public partial class Pawn : DefaultPawn
         base.SetHull(bBox);
         SetupPhysicsFromAABB(PhysicsMotionType.Keyframed, Hull.Mins, Hull.Maxs);
     }
+
+    public override void Simulate(IClient client)
+    {
+        HandleDropping();
+        base.Simulate(client);
+    }
+
+    protected virtual bool HandleDropping()
+    {
+        if(Input.Pressed("drop") && EntitiesInventory is not null)
+        {
+            var entity = EntitiesInventory.Active;
+            if(entity.IsValid())
+            {
+                bool dropped = EntitiesInventory.Drop(entity);
+                if(dropped)
+                {
+                    entity.PhysicsGroup.ApplyImpulse(Velocity + EyeRotation.Forward * 500.0f + Vector3.Up * 100.0f, true);
+                    entity.PhysicsGroup.ApplyAngularImpulse(Vector3.Random * 100.0f, true);
+                }
+                return dropped;
+            }
+        }
+        return false;
+    }
 }
