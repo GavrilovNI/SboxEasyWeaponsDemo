@@ -1,4 +1,5 @@
 ﻿using EasyWeapons.Demo.UI;
+using EasyWeapons.Events;
 using EasyWepons.Demo.Entities.Pawns;
 using Sandbox;
 using System.Linq;
@@ -85,5 +86,11 @@ public partial class EasyWeaponsDemo : GameManager
             return false;
 
         return true;
+    }
+
+    public override void BuildInput()
+    {
+        base.BuildInput();
+        Event.Run(CustomGameEvent.Client.BuildInput.Post);
     }
 }
