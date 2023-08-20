@@ -53,20 +53,18 @@ public partial class PhysGun
 
     protected virtual void UpdateEffects()
     {
-        var owner = Owner as Player;
-
-        if ( owner == null || !BeamActive || owner.ActiveChild != this )
+        if (Owner.IsValid() == false || !BeamActive /*|| owner.ActiveChild != this*/ )
         {
             KillEffects();
             return;
         }
 
-        var startPos = owner.EyePosition;
-        var dir = owner.EyeRotation.Forward;
+        var startPos = Owner.AimRay.Position;
+        var dir = Owner.AimRay.Forward;
 
         var tr = Trace.Ray( startPos, startPos + dir * MaxTargetDistance )
             .UseHitboxes()
-            .Ignore( owner, false )
+            .Ignore( Owner, false )
             .WithAllTags( "solid" )
             .Run();
 

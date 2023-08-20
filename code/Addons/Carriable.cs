@@ -1,4 +1,5 @@
-﻿using Sandbox;
+﻿using EasyWeapons.ViewModels;
+using Sandbox;
 
 public partial class Carriable : BaseCarriable, IUse
 {
@@ -9,7 +10,7 @@ public partial class Carriable : BaseCarriable, IUse
         if ( string.IsNullOrEmpty( ViewModelPath ) )
             return;
 
-        ViewModelEntity = new ViewModel
+        ViewModelEntity = new WeaponViewModel()
         {
             Position = Position,
             Owner = Owner,
