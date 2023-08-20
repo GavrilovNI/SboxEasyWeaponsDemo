@@ -171,7 +171,7 @@ public partial class EntitiesInventory : EntityComponent, IEnumerable<Entity>, I
         if(oldActive.IsValid())
         {
             if(oldActive is BaseCarriable carriable)
-                carriable.ActiveEnd(oldActive, false);
+                carriable.ActiveEnd(oldActive, Entity != oldActive.Parent);
         }
 
         bool isNewValid = newActive.IsValid();
